@@ -75,8 +75,6 @@ Agents use reasoning loops to determine how to act. They decide which tools to u
 5. **Tool** → exposes capabilities to agents  
 6. **Agent** → orchestrates decisions, tools, and prompts  
 
-Introspection tools like `help()` or attribute inspection reveal structure, methods, and configurations for each object.
-
 ---
 
 ## Chain-First vs. Agent-First Design Patterns
@@ -97,9 +95,11 @@ Introspection tools like `help()` or attribute inspection reveal structure, meth
 
 ### Comparison Table
 
-| Aspect        | Chain-First | Agent-First |
-|---------------|-------------|-------------|
-| Flow Control  | Fixed       | Dynamic     |
-| Flexibility   | Low         | High        |
-| Complexity    | Lower       | Higher      |
-| Suitable For  | Linear Tasks | Adaptive Workflows |
+| Aspect| Chain-First| Agent-First|
+| :--- | :--- | :--- |
+| Flow Control| Fixed| Dynamic|
+| Flexibility| Low| High|
+| Complexity| Lower| Higher|
+| Suitable For| Linear Tasks| Adaptive Workflows|
+
+
