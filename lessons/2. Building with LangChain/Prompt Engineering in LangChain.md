@@ -4,7 +4,14 @@ This lesson includes a hands-on coding exercise. After reviewing the material be
 
 <a href="https://colab.research.google.com/github/solomontessema/Agentic-AI-with-Python/blob/main/notebooks/Building with LangChain/Prompt_Flow_Refactor.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
 
----
+*Explore further in the accompanying* **podcast episode**
+
+<a href="https://copilot.microsoft.com/shares/podcasts/U884dp3RDo5tBEDKFxcvo" target="_blank" rel="noopener noreferrer" 
+   style="display:inline-block; background:#0078D4; color:white; padding:2px 24px; border-radius:6px; text-decoration:none; font-weight:600;">
+🎧  Listen 
+   </a>
+
+ ---
 
 ### Advanced Prompt Templates in LangChain
 

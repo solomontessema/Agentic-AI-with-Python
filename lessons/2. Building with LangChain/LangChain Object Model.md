@@ -2,6 +2,15 @@
 
 <a href="https://colab.research.google.com/github/solomontessema/Agentic-AI-with-Python/blob/main/notebooks/Building with LangChain/Building_a_Minimal_Chain_App.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
 
+*Explore further in the accompanying* **podcast episode**
+
+<a href="https://copilot.microsoft.com/shares/podcasts/JpY9BQ4CSZuRn7JNdYg35" target="_blank" rel="noopener noreferrer" 
+   style="display:inline-block; background:#0078D4; color:white; padding:2px 24px; border-radius:6px; text-decoration:none; font-weight:600;">
+🎧  Listen 
+   </a>
+
+ ---
+
 ### Understanding LangChain's Modular Architecture
 
 LangChain is a framework that connects large language models (LLMs) with real-world applications by offering modular components for reasoning, memory, tool usage, and control flow. Each module encapsulates a specific responsibility and can be composed to build intelligent systems.

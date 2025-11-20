@@ -1,0 +1,36 @@
+## 3.2: Conditional and Branching Execution
+
+<a href="https://colab.research.google.com/github/solomontessema/Agentic-AI-with-Python/blob/main/notebooks/Task Flow with LangGraph/Branching_Based_on_Intent.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
+
+*Explore further in the accompanying* **podcast episode**
+
+<a href="https://copilot.microsoft.com/shares/podcasts/owYQuARV8bnfgfgwTwFknjdPN" target="_blank" rel="noopener noreferrer" 
+   style="display:inline-block; background:#0078D4; color:white; padding:2px 24px; border-radius:6px; text-decoration:none; font-weight:600;">
+🎧  Listen 
+   </a>
+
+ ---
+
+###  The Need for Branching Logic
+
+In real-world AI systems, not every input follows the same execution path. Some queries require summaries, others trigger searches, while some might invoke databases or custom tools. Designing a static chain or agent for such diversity is limiting.
+
+LangGraph solves this by enabling conditional branching based on the evolving state.
+
+- Each node can return a special ```next``` key that determines the next step
+
+- The routing logic can inspect any part of the shared state
+
+- This supports dynamic, real-time task redirection
+
+### Branching with GraphNode Return Keys
+
+In LangGraph, node functions can return a dictionary with a special field:
+
+```python
+return {"next": "node_name", **state}
+```
+
+This tells the graph to move execution to ```node_name```.
+
+You can base this on LLM output or predefined state variables.

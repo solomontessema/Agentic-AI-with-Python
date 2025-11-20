@@ -2,6 +2,15 @@
 
 <a href="https://colab.research.google.com/github/solomontessema/Agentic-AI-with-Python/blob/main/notebooks/Building with LangChain/Implementing_a_Multi_Step_Chain.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
 
+*Explore further in the accompanying* **podcast episode**
+
+<a href="https://copilot.microsoft.com/shares/podcasts/ZrG2Spx4QaphoRgeuKfwY" target="_blank" rel="noopener noreferrer" 
+   style="display:inline-block; background:#0078D4; color:white; padding:2px 24px; border-radius:6px; text-decoration:none; font-weight:600;">
+🎧  Listen 
+   </a>
+
+ ---
+
 ### The Role of Chains in LangChain
 
 Chains in LangChain serve as the fundamental orchestration mechanism for guiding language model behavior through structured, multi-step tasks. Unlike agents, which determine control flow at runtime, chains are deterministic pipelines where each step is predefined and executed in sequence.
