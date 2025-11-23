@@ -4,7 +4,7 @@
 
 *Explore further in the accompanying* **podcast episode**
 
-<a href="https://copilot.microsoft.com/shares/podcasts/owYQuARVuyoi8bnwTwFknjdPN" target="_blank" rel="noopener noreferrer" 
+<a href="https://copilot.microsoft.com/shares/podcasts/FRT7KGbSZW4TeSMmnQkyh" target="_blank" rel="noopener noreferrer" 
    style="display:inline-block; background:#0078D4; color:white; padding:2px 24px; border-radius:6px; text-decoration:none; font-weight:600;">
 🎧  Listen 
    </a>

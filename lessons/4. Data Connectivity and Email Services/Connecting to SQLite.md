@@ -1,18 +1,29 @@
 ## 4.1: Connecting to SQLite in Python
 
-https://colab.research.google.com/github/solomontessema/Agentic-AI-with-Python/blob/main/notebooks/Define_schema_extraction_logic.ipynb
+<a href="https://colab.research.google.com/github/solomontessema/Agentic-AI-with-Python/blob/main/notebooks/Data Connectivity and Email Services/Define_schema_extraction_logic.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
 
-Why Use SQLite in Agentic Systems
+*Explore further in the accompanying* **podcast episode**
+
+<a href="https://copilot.microsoft.com/shares/podcasts/MN28rgMgUnTcuuwy5xBCPph" target="_blank" rel="noopener noreferrer" 
+   style="display:inline-block; background:#0078D4; color:white; padding:2px 24px; border-radius:6px; text-decoration:none; font-weight:600;">
+🎧  Listen 
+   </a>
+
+ ---
+
+### Why Use SQLite in Agentic Systems
 
 SQLite is a lightweight, serverless SQL engine that requires no external configuration. It is ideal for prototyping AI agents that need to reason over structured data. In this unit, the reader will build the foundation for enabling GPT to understand and query a real database.
 
 Agents that query databases must first understand the schema—what tables exist, what columns they contain, and how they relate. This contextual data will later be passed into GPT to guide SQL generation.
 
+---
+
 Python includes native support for SQLite via the sqlite3 module.
 
-Basic connection example:
+**Basic connection example:**
 
-
+```python
 import sqlite3
 
 # Connect to (or create) a database file
@@ -30,23 +41,26 @@ CREATE TABLE IF NOT EXISTS users (
 """)
 
 db.commit()
+```
 
-Exploring Table Schema
+### Exploring Table Schema
 
 To support GPT’s reasoning, we must extract the database schema and convert it into text that can be used in prompts.
 
-Retrieve table names:
+**Retrieve table names:**
 
-
+```python
 cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
 tables = cursor.fetchall()
 print("Tables:", tables)
+```
 
-Describe table columns:
+**Describe table columns:**
 
-
+```python
 cursor.execute("PRAGMA table_info(users);")
 columns = cursor.fetchall()
 print("Columns:", columns)
+```
 
 These operations will form the foundation of a reusable schema inspection tool.
