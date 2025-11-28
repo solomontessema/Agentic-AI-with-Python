@@ -3,7 +3,7 @@
 
 This lesson includes a hands-on coding exercise. After reviewing the material below, please open the lab assignment using the link below:
 
-<a href="https://colab.research.google.com/github/solomontessema/Agentic-AI-with-Python/blob/main/notebooks/Foundations of Agentic AI/Enhancing_the_Agent_Skeleton.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
+<a href="https://colab.research.google.com/github/solomontessema/Agentic-AI-with-Python/blob/main/notebooks/Foundations of Agentic AI/Implementing_a_Basic_Agent.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
 ---
 
 ### What Is an Agent?

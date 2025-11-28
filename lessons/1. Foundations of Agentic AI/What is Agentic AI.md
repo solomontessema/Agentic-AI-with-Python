@@ -1,12 +1,6 @@
 
 ### **1.1: What is Agentic AI?**
 
-This lesson includes a hands-on coding exercise. After reviewing the material below, please open the lab assignment using the link below:
-
-<a href="https://colab.research.google.com/github/solomontessema/Agentic-AI-with-Python/blob/main/notebooks/Foundations of Agentic AI/LangChain_Agent_with_Simulated_Tool.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
-
----
-
 ##### Podcast Episode — *What is Agentic AI?*
 
 Learn more about this topic in the accompanying audio lesson.  
