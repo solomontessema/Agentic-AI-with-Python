@@ -1,6 +1,6 @@
 ## 2.4: Advanced Agent Construction
 
-<a href="https://colab.research.google.com/github/solomontessema/Agentic-AI-with-Python/blob/main/notebooks/Building with LangChain/Plan_and_Execute_Agent.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
+<a href="https://colab.research.google.com/github/solomontessema/Agentic-AI-with-Python/blob/main/notebooks/Building with LangChain/Building_a_Conversational_Agent.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
 
 *Explore further in the accompanying* **podcast episode**
 
@@ -18,8 +18,8 @@ LangChain's agent architecture enables developers to create intelligent, adaptiv
 Key requirements for advanced agents:
 
 * **Selective Tool Loading:** Loading tools based on the specific task or context.
-* **Dynamic System Prompts:** Using **`agent_kwargs`** to dynamically shape the agent's personality, behavior, or operational scope.
-* **Memory Integration:** Incorporating **chat history or memory** for conversational continuity.
+* **Dynamic System Prompts:** Using advanced prompts to dynamically shape the agent's personality, behavior, or operational scope.
+* **Memory Integration:** Incorporating memory for conversational continuity.
 * **Longer-Term Planning:** Implementing strategies for goal decomposition and multi-step tasks.
 
 These capabilities allow for more robust, flexible, and user-aligned intelligent agents.

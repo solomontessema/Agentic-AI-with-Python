@@ -1,6 +1,8 @@
 
 ### **1.1: What is Agentic AI?**
 
+---
+
 ##### Podcast Episode — *What is Agentic AI?*
 
 Learn more about this topic in the accompanying audio lesson.  
