@@ -19,7 +19,7 @@ LangChain's object model is highly decoupled and abstracts core AI functions:
 
 - **Language understanding and generation** via LLMs  
 - **Instruction formatting** via Prompt Templates  
-- **Reasoning pipelines** via Chains  
+- **Reasoning pipelines** via Runnables (LangChain Expression Language)  
 - **External action interfaces** via Tools  
 - **Decision-making entities** via Agents  
 
@@ -34,7 +34,7 @@ This modular design supports both simple task automation and complex agentic beh
 LLM objects wrap communication with model APIs and handle configuration such as model name, temperature, and system instructions.
 
 ```python
-from langchain.chat_models import ChatOpenAI
+from langchain_openai import ChatOpenAI
 llm = ChatOpenAI(model="gpt-4", temperature=0)
 ```
 
@@ -45,22 +45,37 @@ llm = ChatOpenAI(model="gpt-4", temperature=0)
 PromptTemplates structure the input passed to the LLM, allowing variables to be substituted at runtime. They ensure consistent prompt formatting across tasks.
 
 ```python
-from langchain.prompts import PromptTemplate
-prompt = PromptTemplate(
-    input_variables=["question"],
-    template="Answer the following: {question}"
+from langchain_core.prompts import ChatPromptTemplate
+prompt = ChatPromptTemplate.from_template(
+    "Answer the following: {question}"
 )
 ```
 ---
 
-### **Chains**
+### **Runnables and LCEL (LangChain Expression Language)**
 
-Chains represent sequences of processing steps. Outputs from one step flow into the next, allowing structured reasoning pipelines.
+Runnables are the modern building blocks of LangChain pipelines, replacing the older `Chain` classes. They implement a common interface (`invoke`, `stream`, `batch`) and are composed using the **pipe operator (`|`)**, forming what is called a **LangChain Expression Language (LCEL)** chain.
 
 ```python
-from langchain.chains import LLMChain
-chain = LLMChain(llm=llm, prompt=prompt)
+from langchain_openai import ChatOpenAI
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.output_parsers import StrOutputParser
+
+llm = ChatOpenAI(model="gpt-4", temperature=0)
+prompt = ChatPromptTemplate.from_template("Answer the following: {question}")
+output_parser = StrOutputParser()
+
+# Compose a pipeline using the pipe operator
+chain = prompt | llm | output_parser
+
+# Invoke the pipeline
+result = chain.invoke({"question": "What is the capital of France?"})
 ```
+
+Every component in an LCEL chain is a `Runnable`. This means you can mix and match prompts, models, output parsers, and custom functions seamlessly. The `|` operator passes the output of one step as the input to the next.
+
+> **Note:** The legacy `LLMChain` class is deprecated. Use LCEL with the pipe operator instead.
+
 ---
 
 ### **Tools**
@@ -75,20 +90,19 @@ Agents use reasoning loops to determine how to act. They decide which tools to u
 
 ---
 
-## LangChain’s Object Hierarchy
+## LangChain's Object Hierarchy
 
 1. **PromptTemplate** → formats instructions  
 2. **LLM** → generates text from prompts  
-3. **LLMChain** → binds prompts and models together  
-4. **SequentialChain / SimpleSequentialChain** → builds multi-step flows  
-5. **Tool** → exposes capabilities to agents  
-6. **Agent** → orchestrates decisions, tools, and prompts  
+3. **Runnable / LCEL Chain** → composes prompts, models, and parsers using `|`  
+4. **Tool** → exposes capabilities to agents  
+5. **Agent** → orchestrates decisions, tools, and prompts  
 
 ---
 
-## Chain-First vs. Agent-First Design Patterns
+## Runnable-First vs. Agent-First Design Patterns
 
-### **Chain-First**
+### **Runnable-First (formerly Chain-First)**
 - Deterministic  
 - Fixed workflow  
 - Lower complexity  
@@ -104,11 +118,9 @@ Agents use reasoning loops to determine how to act. They decide which tools to u
 
 ### Comparison Table
 
-| Aspect| Chain-First| Agent-First|
+| Aspect| Runnable-First| Agent-First|
 | :--- | :--- | :--- |
 | Flow Control| Fixed| Dynamic|
 | Flexibility| Low| High|
 | Complexity| Lower| Higher|
 | Suitable For| Linear Tasks| Adaptive Workflows|
-
-

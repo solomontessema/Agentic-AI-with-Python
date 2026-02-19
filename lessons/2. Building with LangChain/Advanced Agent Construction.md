@@ -11,139 +11,74 @@
 
  ---
 
-### Beyond Basics: Configurable Agent Design
-
-LangChain's agent architecture enables developers to create intelligent, adaptive systems that make decisions, invoke tools, and manage reasoning across multiple steps. Advanced use cases require **flexible and robust configuration** beyond simple tool lists.
-
-Key requirements for advanced agents:
-
-* **Selective Tool Loading:** Loading tools based on the specific task or context.
-* **Dynamic System Prompts:** Using advanced prompts to dynamically shape the agent's personality, behavior, or operational scope.
-* **Memory Integration:** Incorporating memory for conversational continuity.
-* **Longer-Term Planning:** Implementing strategies for goal decomposition and multi-step tasks.
-
-These capabilities allow for more robust, flexible, and user-aligned intelligent agents.
+LangChain supports building intelligent agents that use reasoning to select tools, maintain memory, and interact over multiple steps. These agents are constructed using the create_agent() function, which enables the integration of a language model, tools, system prompt, middleware, and checkpointing to create structured, persistent conversational systems.
+Agents differ from chains and runnables in that they determine their control flow dynamically. They inspect each interaction, select appropriate tools, and respond accordingly—often over extended conversations. This section guides the reader through the process of building an agent by combining key LangChain components in a composable manner.
 
 ---
 
-### Anatomy of `initialize_agent()`
-
-LangChain provides the **`initialize_agent()`** function as the modular entry point to construct agent instances. This function handles agent setup and configuration, enabling significant behavioral customization without altering the core agent logic.
+### Defining Tools for the Agent
+As it is discussed earlier, tools are functional components the agent can call. Each tool is registered with a name, function, and description. For example, a tool to check product inventory might look like:
 
 ```python
-initialize_agent(
-    tools: List[Tool],
-    llm: BaseLanguageModel,
-    agent: AgentType = AgentType.ZERO_SHOT_REACT_DESCRIPTION,
-    verbose: bool = False,
-    agent_kwargs: Optional[dict] = None,
-    # Additional argument for memory:
-    memory=None 
+def check_inventory(product_name: str) -> str:
+    return f"There are 10 count of {product_name}."
+
+# tool definition
+check_inventory_tool = Tool(
+    name="check_inventory",
+    func=check_inventory,
+    description="Returns the current stock count for a given  product name."
 )
 ```
 
-- tools: A list of callable tool objects with name, description, and function
-
- - llm: The core reasoning engine (e.g., ChatOpenAI)
-
-- agent: The control loop strategy (e.g., Zero-Shot ReAct)
-
-- agent_kwargs: Optional dictionary for customizing the agent prompt, prefix, format, or suffix
-
-This modular entry point enables significant behavioral customization without altering agent logic.
-
 ---
 
-### Types of Agents in LangChain
-
-LangChain currently supports multiple agent strategies that can be used for different contexts:
-
-1. Zero-Shot ReAct (default)
-
-    - Agent infers reasoning steps without prior examples
-
-    - Best suited for well-described tools
-
-    - Uses the "Thought -> Action -> Observation" loop
-
-2. Plan-and-Execute
-
-    - Agent plans high-level subgoals first, then executes each one
-
-    - Ideal for long or hierarchical tasks
-
-    - Adds structure and transparency to reasoning
-
-3. Conversational ReAct (via memory)
-
-    - Integrates chat history or memory buffer
-
-    - Useful for customer service, multi-turn Q&A
-
-    - Often paired with ConversationBufferMemory
-
-Each strategy balances reasoning depth and interpretability.
-
----
-
-### Customizing Agents with agent_kwargs
-
-agent_kwargs allows developers to override the default system prompt or introduce structured prompting to guide behavior.
-
-**Example: Define a focused agent prompt**
+### Designing the System Prompt
+The system prompt defines the agent's behavior and objectives. It is passed directly into the create_agent() configuration and influences how the language model interprets user input and decides on actions.
+A system prompt might include structured instructions:
 
 ```python
-from langchain.prompts import PromptTemplate
-
-custom_prompt = PromptTemplate(
-    input_variables=["input"],
-    template="""
-    You are an academic assistant specialized in AI. Use available tools to:
-    1. Search relevant articles
-    2. Summarize findings
-    3. Generate a brief report
-
-    Begin the task now: {input}
-    """
-)
-
-agent = initialize_agent(
-    tools=[search_tool, summarize_tool],
-    llm=llm,
-    agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
-    verbose=True,
-    agent_kwargs={"prompt": custom_prompt}
-)
+system_prompt = """
+You are a helpful and detailed customer service agent.
+You must use your tools whenever necessary to answer questions about inventory.
+"""
 ```
 
-This pattern allows precise behavioral tuning while retaining full ReAct functionality.
+System prompts can include stepwise guidance, tool usage policies, or domain constraints to shape the agent's reasoning process.
 
 ---
 
-### Integrating Memory into Agents
-
-LangChain supports memory modules such as ConversationBufferMemory, enabling agents to maintain dialogue history.
+### Adding Summarization Middleware
+Middleware enables runtime control of interaction, such as summarizing conversations to reduce memory usage. One common middleware is SummarizationMiddleware, which triggers based on token count or message length:
 
 ```python
-from langchain.memory import ConversationBufferMemory
+from langchain.agents.middleware import SummarizationMiddleware
 
-memory = ConversationBufferMemory(memory_key="chat_history") 
-
-agent = initialize_agent(
-    tools=[search_tool],
-    llm=llm,
-    agent=AgentType.CONVERSATIONAL_REACT_DESCRIPTION,
-    verbose=True,
-    memory=memory
-)
+summarization_middleware = SummarizationMiddleware(
+     model="gpt-4o-mini",
+     trigger=('tokens', 1000),
+     keep=('messages', 5),
+     )
 ```
 
-This empowers agents to:
+This middleware preserves the most recent exchanges and summarizes earlier messages, keeping the agent within token constraints.
 
-- Recall previous user inputs
+---
 
-- Maintain context across turns
+### Creating the Agent
 
-- Support dynamic follow-up interactions
+With the language model, tools, system prompt, middleware, and checkpointing defined, the agent can be assembled using create_agent():
 
-Memory is crucial in building assistants that behave coherently across sessions.
+```python
+llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+
+conversational_agent = create_agent(
+    model=llm,
+    tools=[check_inventory_tool],
+    system_prompt=system_prompt,
+    middleware=[summarization_middleware],
+    checkpointer=InMemorySaver(),
+    )
+
+```
+The agent object returned by create_agent() manages the full loop of message processing, reasoning, tool invocation, and state management.

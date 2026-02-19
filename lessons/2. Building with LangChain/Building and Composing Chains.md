@@ -1,126 +1,127 @@
-## 2.2: Building and Composing Chains
+# 2.2: Building and Composing Chains
 
-<a href="https://colab.research.google.com/github/solomontessema/Agentic-AI-with-Python/blob/main/notebooks/Building with LangChain/Implementing_a_Runnable_Sequence.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
+## The Role of Chains in LangChain
 
-*Explore further in the accompanying* **podcast episode**
+In LangChain, chains are built using **LangChain Expression Language (LCEL)** — a declarative, composable syntax using the `|` pipe operator. LCEL provides a unified `Runnable` interface that is transparent, streamable, and production-ready.
 
-<a href="https://copilot.microsoft.com/shares/podcasts/ZrG2Spx4QaphoRgeuKfwY" target="_blank" rel="noopener noreferrer" 
-   style="display:inline-block; background:#0078D4; color:white; padding:2px 24px; border-radius:6px; text-decoration:none; font-weight:600;">
-🎧  Listen 
-   </a>
+LCEL chains are ideal for scenarios such as:
 
- ---
+- Summarizing data
+- Formatting outputs
+- Transforming inputs
+- Chaining multiple LLM calls
 
-### The Role of Chains in LangChain
-
-Chains in LangChain serve as the fundamental orchestration mechanism for guiding language model behavior through structured, multi-step tasks. Unlike agents, which determine control flow at runtime, chains are deterministic pipelines where each step is predefined and executed in sequence.
-
-Chains are ideal for scenarios requiring controlled reasoning, sequential formatting, and repeated application of logic—such as:
-
-- Summarizing data  
-- Formatting outputs  
-- Transforming inputs  
-- Chaining multiple LLM calls  
-
-LangChain supports several chain variants:
-
-- **LLMChain** — A basic chain that pairs a single prompt with a language model.  
-- **SimpleSequentialChain** — A linear chain where the output of one step becomes the input of the next.  
-- **SequentialChain** — An advanced chain that allows named inputs/outputs and intermediate variable passing.  
+Every component in LCEL — prompts, models, parsers, and custom functions — implements the `Runnable` interface, sharing a consistent API: `.invoke()`, `.stream()`, and `.batch()`. The `|` operator composes these runnables left-to-right, passing the output of each step as input to the next.
 
 ---
 
-## Creating an LLMChain for Question Answering
-
-The simplest chain in LangChain is the **LLMChain**, which takes a prompt and an LLM and returns a response. It is well-suited for atomic tasks like Q&A, summarization, or classification.
+## Creating a Basic Chain for Question Answering
 
 ```python
-llm = ChatOpenAI(model="gpt-4", temperature=0)
+from langchain_openai import ChatOpenAI
+from langchain_core.prompts import PromptTemplate
+from langchain_core.output_parsers import StrOutputParser
+
+llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
 
 prompt = PromptTemplate(
     input_variables=["topic"],
     template="What are the latest trends in {topic}?"
 )
 
-chain = LLMChain(llm=llm, prompt=prompt)
-response = chain.run({"topic": "machine learning"})
+chain = prompt | llm | StrOutputParser()
+response = chain.invoke({"topic": "machine learning"})
 print(response)
 ```
 
+This is the foundational pattern: a prompt feeds into the model, and a parser extracts the text response.
+
 ---
-### Composing Multi-Step Logic with SimpleSequentialChain
 
-SimpleSequentialChain allows developers to stack multiple LLMChain objects in a pipeline. The output of one chain becomes the input of the next. This is useful when reasoning and formatting occur in stages.
+## Composing Multi-Step Logic
 
-#### Example: Summarize → Rephrase
+You can pipe chains together to build multi-stage pipelines. When the output of one chain needs to be reshaped before entering the next, use a `RunnableLambda` to remap it.
+
+**Example: Summarize → Rephrase**
 
 ```python
-from langchain.chains import SimpleSequentialChain
+from langchain_openai import ChatOpenAI
+from langchain_core.prompts import PromptTemplate
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.runnables import RunnableLambda
 
-# First Chain: Summarize input text
+llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+
 summarize_prompt = PromptTemplate(
     input_variables=["input_text"],
     template="Summarize this content: {input_text}"
 )
-summarize_chain = LLMChain(llm=llm, prompt=summarize_prompt)
 
-# Second Chain: Rephrase the summary
 rephrase_prompt = PromptTemplate(
     input_variables=["text"],
     template="Rephrase this summary professionally: {text}"
 )
-rephrase_chain = LLMChain(llm=llm, prompt=rephrase_prompt)
 
-# Compose the chain
-pipeline = SimpleSequentialChain(chains=[summarize_chain, rephrase_chain], verbose=True)
+summarize_chain = summarize_prompt | llm | StrOutputParser()
+rephrase_chain = rephrase_prompt | llm | StrOutputParser()
 
-output = pipeline.run("The global AI market is projected to grow significantly over the next decade.")
+pipeline = (
+    summarize_chain
+    | RunnableLambda(lambda summary: {"text": summary})
+    | rephrase_chain
+)
+
+output = pipeline.invoke({"input_text": "The global AI market is projected to grow significantly over the next decade."})
 print(output)
 ```
-This model demonstrates how output from one reasoning stage can be transformed and refined in subsequent steps.
+
+The `RunnableLambda` in the middle remaps the string output of the first chain into the dict shape the next prompt expects.
 
 ---
 
-### Advanced Composition with SequentialChain
+## Advanced Composition with Named Intermediate Outputs
 
-SequentialChain introduces greater control by letting developers name inputs and outputs. This enables complex multi-step systems where intermediate outputs are preserved and passed selectively.
+When you need to preserve and selectively pass intermediate values across multiple steps, use `RunnablePassthrough.assign()`. This accumulates outputs into a shared dict as it flows through the chain, keeping all intermediate results accessible.
 
-#### Use Case: Extract Entities → Summarize → Format Response
+**Use Case: Extract Entities → Summarize → Format Response**
 
 ```python
-from langchain.chains import SequentialChain
+from langchain_openai import ChatOpenAI
+from langchain_core.prompts import PromptTemplate
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.runnables import RunnablePassthrough
 
-# Prompt 1: Extract named entities
+llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+
 entity_prompt = PromptTemplate(
     input_variables=["input_text"],
     template="Extract all people, organizations, and locations from the following: {input_text}"
 )
-entity_chain = LLMChain(llm=llm, prompt=entity_prompt, output_key="entities")
 
-# Prompt 2: Summarize entities
 summary_prompt = PromptTemplate(
     input_variables=["entities"],
     template="Summarize the following extracted entities: {entities}"
 )
-summary_chain = LLMChain(llm=llm, prompt=summary_prompt, output_key="summary")
 
-# Prompt 3: Format response
 format_prompt = PromptTemplate(
     input_variables=["summary"],
     template="Format this into a user-friendly paragraph: {summary}"
 )
-format_chain = LLMChain(llm=llm, prompt=format_prompt, output_key="final_output")
 
-# Compose the multi-step chain
-sequential_chain = SequentialChain(
-    chains=[entity_chain, summary_chain, format_chain],
-    input_variables=["input_text"],
-    output_variables=["final_output"],
-    verbose=True
+entity_chain = entity_prompt | llm | StrOutputParser()
+summary_chain = summary_prompt | llm | StrOutputParser()
+format_chain = format_prompt | llm | StrOutputParser()
+
+sequential_chain = (
+    RunnablePassthrough.assign(entities=entity_chain)
+    | RunnablePassthrough.assign(summary=summary_chain)
+    | RunnablePassthrough.assign(final_output=format_chain)
 )
 
-result = sequential_chain({"input_text": "OpenAI and Google DeepMind are competing in developing AGI."})
+result = sequential_chain.invoke({"input_text": "OpenAI and Google DeepMind are competing in developing AGI."})
 print(result["final_output"])
-
 ```
-This modular architecture enables better debugging, logging, and reuse across complex workflows.
+
+`RunnablePassthrough.assign()` takes the current dict, runs the provided chain against it, and merges the result back under the given key. Each step enriches the shared dict, making all intermediate outputs available downstream for debugging, logging, or reuse.
+
+This modular architecture integrates cleanly with LangSmith tracing and supports streaming out of the box.
